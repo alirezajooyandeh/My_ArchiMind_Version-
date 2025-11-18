@@ -1,355 +1,198 @@
-# Floor Plan Analysis MVP
+🏛️ ArchiMind — AI-Powered Floor Plan Understanding MVP
 
-A local MVP application for analyzing floor plans using YOLO object detection. Upload floor plans (PDF/JPG/PNG), detect walls, doors, windows, and rooms, and export visual overlays and structured data.
+Automated wall, door, window, and room detection for architectural drawings
 
-## Features
+ArchiMind is an AI tool that analyzes architectural floor plans and extracts building intelligence instantly.
+This early MVP demonstrates the core capabilities of the platform—built specifically for the architecture, engineering, and construction (AEC) industry.
 
-- **Object Detection**: Detect walls, doors, windows, and rooms using trained YOLO weights
-- **Visual Overlay**: View detections with customizable labels, room fills, and interior outlines
-- **Structured Exports**: Export results as PNG overlay, CSV table, and JSON data
-- **Scale Estimation**: Support for unknown, explicit, and scale bar measurement modes
-- **Auto-Tune**: Automatically optimize detection parameters based on plan characteristics
-- **Dark Theme UI**: Modern, responsive web interface
-- **REST API**: Clean HTTP API for programmatic access
+🚀 What This MVP Does
 
-## Prerequisites
+The system takes an uploaded floor plan image (PNG/JPG/PDF) and automatically:
 
-- Python 3.8 or higher
-- pip package manager
-- YOLO model weights (`.pt` files) for wall, door, window, and room detection
-- poppler-utils (for PDF processing on Linux/Mac)
+1. Detects Architectural Components
 
-### Installing poppler-utils
+🧱 Walls (straight + curved)
 
-**macOS:**
-```bash
-brew install poppler
-```
+🚪 Doors
 
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt-get install poppler-utils
-```
+🪟 Windows
 
-**Windows:**
-Download poppler binaries from [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases) and add to PATH.
+🏠 Rooms (with area calculations)
 
-## Installation
+2. Computes Room Areas
 
-1. **Clone or navigate to the project directory:**
-   ```bash
-   cd "MVP-Version 2"
-   ```
+Automatic square footage (ft²)
 
-2. **Create a virtual environment (recommended):**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+Pixel area fallback when scaling is unknown
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. Renders a Visual Overlay
 
-4. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Edit `.env` and set the paths to your YOLO model weights:
-   ```env
-   WALL_WEIGHTS_PATH=/path/to/wall.pt
-   DOOR_WEIGHTS_PATH=/path/to/door.pt
-   WINDOW_WEIGHTS_PATH=/path/to/window.pt
-   ROOM_WEIGHTS_PATH=/path/to/room.pt
-   ```
+Wall boxes
 
-   **Note:** You can leave weights paths empty if you don't have models for all classes. The app will continue to work with available models.
+Room fill colors
 
-## Running the Application
+Labels & tooltips
 
-1. **Start the server:**
-   ```bash
-   python -m backend.main
-   ```
-   
-   Or using uvicorn directly:
-   ```bash
-   uvicorn backend.main:app --host 127.0.0.1 --port 8000
-   ```
+Interactive legend
 
-2. **Open your browser:**
-   Navigate to `http://127.0.0.1:8000`
+4. Exports Key Data
 
-3. **Upload a floor plan:**
-   - Drag and drop a PDF, JPG, or PNG file onto the upload zone
-   - Adjust settings as needed
-   - Click "Process"
+JSON detection output
 
-## Sharing with Cloudflare Tunnel
+Visual PNG overlay
 
-To expose the local MVP server to the internet securely:
+Simple interaction through a clean web interface
 
-1. **First-time setup (macOS):**
-   ```bash
-   ./setup_cloudflare_tunnel.sh
-   ```
-   
-   This will:
-   - Install `cloudflared` via Homebrew
-   - Authenticate with Cloudflare
-   - Create the tunnel
-   - Set up the configuration
+This MVP is the foundation of the full ArchiMind roadmap, which aims to include automated CBC code compliance, fixture counting, ADA validation, and cost estimation.
 
-2. **Start the backend server:**
-   ```bash
-   ./run_mvp.sh -p 8090
-   ```
+🏗️ Tech Stack
+Backend (FastAPI)
 
-3. **In another terminal, run the tunnel:**
-   ```bash
-   cloudflared tunnel run archimind-mvp
-   ```
+Python
 
-4. **Share the public URL:**
-   The tunnel will output a public HTTPS URL like:
-   ```
-   https://randomstring.trycloudflare.com
-   ```
-   
-   This URL can be shared with other users and will securely forward to your local MVP UI.
+Ultralytics YOLO models (Wall/Window/Door/Room)
 
-**Note:** No CORS changes are needed because Cloudflare Tunnel forwards requests internally as if they came from localhost.
+OpenCV
 
-## Usage
+Geometry tools (Shapely-like utilities)
 
-### Web UI
+NMS thresholding controls
 
-1. **Settings Panel (Left):**
-   - Adjust image size, confidence thresholds, display options
-   - Configure PDF processing, advanced geometry parameters
-   - Set scale mode (unknown, explicit pixels-per-foot, or scale bar measurement)
+Robust image preprocessing
 
-2. **Upload Zone (Center):**
-   - Drag and drop or click to browse for floor plan files
-   - Supported formats: PDF (first page), JPG, JPEG, PNG
-   - Maximum file size: 50 MB (configurable)
+Frontend
 
-3. **Results Tabs:**
-   - **Overlay**: Visual overlay with detections, zoom controls, export buttons
-   - **Table**: Tabular view of all detections and rooms
-   - **JSON**: Full JSON response with all data
+HTML
 
-### Scale Bar Measurement
+CSS
 
-1. Process an image first
-2. In Settings, select "Scale Bar" mode
-3. Click "Start Measurement"
-4. Click two points on the image (e.g., opposite ends of a known wall)
-5. Enter the real-world distance in feet
-6. Click "Apply" - the scale will be calculated and used for area calculations
+JavaScript
 
-### API Endpoints
+Dynamic overlays
 
-#### `GET /healthz`
-Check server health and model availability.
+Interactive UI components
 
-**Response:**
-```json
-{
-  "status": "healthy",
-  "device": "cpu",
-  "models_loaded": {
-    "wall": true,
-    "door": true,
-    "window": false,
-    "room": true
-  },
-  "ready": true
-}
-```
+Infrastructure
 
-#### `POST /process`
-Process a floor plan.
+Cloudflare Tunnel (optional)
 
-**Form Data:**
-- `file`: PDF/JPG/PNG file
-- `imgsz`: Image size for inference (default: 1280)
-- `wall_conf`, `door_conf`, `wind_conf`, `room_conf`: Confidence thresholds (0-1)
-- `show_labels`: Boolean
-- `fill_rooms`: Boolean
-- `outline_interior`: Boolean
-- `outline_thickness`: Integer
-- `overlay_style`: "simple" or "detailed"
-- `pdf_mode`: Boolean
-- `pdf_dpi`: Integer (default: 300)
-- `auto_tune`: Boolean
-- `prefer_interior_footprint`: Boolean
-- `wall_thick_px`: Integer
-- `door_bridge_extra_px`: Integer
-- `min_room_area_px`: Integer
-- `footprint_grow_px`: Integer
-- `scale_mode`: "unknown", "explicit", or "bar"
-- `explicit_scale`: Float (pixels per foot, for explicit mode)
-- `measure_point1_x`, `measure_point1_y`, `measure_point2_x`, `measure_point2_y`: Floats (for bar mode)
-- `measure_distance_ft`: Float (for bar mode)
+Local development FastAPI server
 
-**Response:**
-```json
-{
-  "request_id": "uuid",
-  "meta": {
-    "filename": "plan.pdf",
-    "width": 2000,
-    "height": 1500,
-    "imgsz": 1280,
-    "device": "cpu",
-    "timings": {...}
-  },
-  "detections": {
-    "wall": [...],
-    "door": [...],
-    "window": [...],
-    "room": [...]
-  },
-  "rooms": [...],
-  "downloads": {
-    "overlay.png": "/download/{request_id}/overlay.png",
-    "data.csv": "/download/{request_id}/data.csv",
-    "data.json": "/download/{request_id}/data.json"
-  },
-  "settings_used": {...},
-  "warnings": []
-}
-```
+Virtual environment (.venv)
 
-#### `GET /download/{request_id}/{filename}`
-Download generated files (overlay.png, data.csv, data.json).
-
-## Configuration
-
-### Environment Variables
-
-Edit `.env` to configure:
-
-- **Model Weights**: Paths to YOLO `.pt` files
-- **Default Parameters**: Default confidence thresholds, image size
-- **Server**: Host, port, max upload size
-- **Device**: `auto`, `cpu`, or `cuda`
-- **Temporary Files**: Directory and TTL for cleanup
-
-### Settings Panel
-
-All settings can be adjusted in the web UI without restarting the server.
-
-## Testing Acceptance Criteria
-
-### 1. Upload and Process
-- ✅ Upload a PDF and get processed overlay, CSV, and JSON
-- ✅ Upload a JPG and get processed overlay, CSV, and JSON
-
-### 2. Settings Response
-- ✅ Change `imgsz` and see results update
-- ✅ Adjust per-class confidence thresholds and see detection changes
-- ✅ Toggle `show_labels`, `fill_rooms`, `outline_interior` and see visual changes
-- ✅ Change `outline_thickness` and see outline thickness change
-- ✅ Switch `scale_mode` and `explicit_scale` and see area_sf appear/disappear
-- ✅ Enable `auto_tune` and see optimized parameters in `settings_used`
-
-### 3. Room Areas
-- ✅ With `scale_mode=unknown`: rooms show `area_px` only, `area_sf` is null/empty
-- ✅ With `scale_mode=explicit` and valid `explicit_scale`: rooms show both `area_px` and `area_sf`
-- ✅ `area_sf` values are reasonable (e.g., 100-500 sq ft for typical rooms)
-
-### 4. Missing Models
-- ✅ If one weight path is missing, app still runs with remaining classes
-- ✅ Warnings appear in both UI (alert) and JSON response
-
-### 5. Download Buttons
-- ✅ Export PNG downloads overlay image
-- ✅ Export CSV downloads CSV table
-- ✅ Export JSON downloads JSON data
-- ✅ All downloads are tied to the last processed request
-
-### 6. Health Endpoint
-- ✅ Reports device (cpu/cuda)
-- ✅ Reports model availability per class
-- ✅ Reports ready status
-
-### 7. Auto-Tune
-- ✅ On a noisy plan, auto-tune increases `imgsz` and adjusts thresholds
-- ✅ Chosen values appear in `settings_used`
-
-## Project Structure
-
-```
+📦 Project Structure
 MVP-Version 2/
 ├── backend/
-│   ├── __init__.py
-│   ├── main.py              # FastAPI application
-│   ├── config.py             # Configuration management
-│   ├── models.py             # YOLO model loading and inference
-│   ├── image_utils.py        # Image/PDF processing
-│   ├── geometry.py           # Room polygonization, area calculations
-│   ├── overlay.py            # Overlay rendering
-│   ├── auto_tune.py          # Auto-tuning logic
-│   ├── exports.py            # CSV/JSON export
-│   ├── scale.py              # Scale estimation
-│   └── file_manager.py       # File management
+│   ├── main.py              # FastAPI entry point
+│   ├── models.py            # YOLO model loading + inference
+│   ├── geometry_v2.py       # Room + wall geometry logic
+│   ├── image_utils.py       # Pre/post-processing
+│   ├── scale.py             # Unit scaling + ft² logic
+│   └── overlay.py           # Drawing overlays
+│
 ├── frontend/
-│   ├── index.html            # Main HTML
-│   ├── styles.css            # Dark theme styles
-│   └── app.js                # Frontend JavaScript
+│   ├── index.html           # Main MVP UI
+│   ├── landing.html         # Landing page
+│   ├── styles.css           # Stylesheet
+│   └── app.js               # Main UI logic
+│
+├── tests/
+│   ├── test_api.py          # API tests
+│   ├── test_exports.py
+│   └── test_geometry.py
+│
+├── run_mvp.sh               # Quick start script
+├── cloudflared.yml          # Tunnel config
 ├── requirements.txt         # Python dependencies
-├── .env.example             # Environment variable template
-├── .gitignore
-└── README.md
-```
+├── README.md                # This file
+└── QUICKSTART.md            # Fast developer setup
 
-## Troubleshooting
+⚙️ How to Run Locally
+1. Clone the repo
+git clone https://github.com/alirezajooyandeh/My_ArchiMind_Version-.git
+cd My_ArchiMind_Version-
 
-### Models Not Loading
-- Check that weight file paths in `.env` are correct and files exist
-- Verify file permissions
-- Check logs for specific error messages
+2. Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
 
-### PDF Processing Fails
-- Ensure poppler-utils is installed and in PATH
-- Try converting PDF to image manually first
-- Check PDF is not corrupted
+3. Install dependencies
+pip install -r requirements.txt
 
-### Out of Memory
-- Reduce `imgsz` in settings
-- Disable `fill_rooms` option
-- Process smaller images
+4. Run the server
+./run_mvp.sh
 
-### Slow Performance
-- Enable GPU if available (set `DEVICE=cuda` in `.env`)
-- Reduce `imgsz`
-- Disable `auto_tune` for faster processing
 
-## Development
+The app will be available at:
 
-### Running Tests
+Main app: http://localhost:8090/mvp
 
-Basic unit tests are included in `tests/`:
+Landing page: http://localhost:8090/
 
-```bash
-python -m pytest tests/
-```
+🧠 Model Details
 
-### Adding New Classes
+The MVP uses 4 custom-trained YOLO models:
 
-1. Add weight path to `.env`
-2. Update `CLASS_COLORS` in `backend/overlay.py`
-3. Add class name to frontend legend in `frontend/app.js`
+Model	Purpose
+wall.pt	Wall detection (segmentation + bounding)
+door.pt	Door detection
+window.pt	Window detection
+room.pt	Room segmentation + area extraction
 
-## License
+Training involved:
 
-This is a local MVP application. Use as needed for your project.
+Hundreds of annotated architectural floor plans
 
-## Support
+Curved wall augmentation
 
-For issues or questions, check the logs in the terminal where the server is running. Error messages are designed to be helpful and actionable.
+Multi-scale training (1280/1536/1920)
 
+Advanced augmentation (tiling, mosaic, rotation)
+
+📡 Roadmap (Upcoming Features)
+Short-Term
+
+ADA door clearance checking
+
+Automatic CBC-based occupancy & egress calculations
+
+Fixture counting (toilets, sinks, urinals, showers)
+
+Room naming via OCR
+
+Smart room polygon repair
+
+Medium-Term
+
+AI-based code compliance engine (CBC 2022)
+
+Dynamic architectural specs generator
+
+Revit plug-in
+
+Space programming & optimization
+
+Long-Term (Vision)
+
+ArchiMind becomes the “AI brain” of architecture firms:
+
+Automated QA/QC
+
+Permit-ready drawing validation
+
+Cost estimation
+
+Construction documentation automation
+
+👤 Author
+
+Ali Jooyandeh
+Architectural Job Captain (K-12 Design)
+AI/Deep Learning Developer
+Founder, ArchiMind
+
+📧 Contact
+
+If you’re interested in contributing, partnering, or becoming a co-founder:
+
+📩 alirezajooyandeh@gmail.com

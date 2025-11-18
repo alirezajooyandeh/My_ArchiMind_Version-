@@ -1,64 +1,62 @@
-🏛️ ArchiMind — AI-Powered Floor Plan Understanding MVP
+ArchiMind — AI-Powered Floor Plan Understanding (MVP)
 
-Automated wall, door, window, and room detection for architectural drawings
+ArchiMind is an AI system that reads architectural floor plans and extracts building intelligence automatically.
+This MVP demonstrates the core capabilities of the platform, built specifically for the architecture, engineering, and construction (AEC) industry.
 
-ArchiMind is an AI tool that analyzes architectural floor plans and extracts building intelligence instantly.
-This early MVP demonstrates the core capabilities of the platform—built specifically for the architecture, engineering, and construction (AEC) industry.
+What This MVP Does
 
-🚀 What This MVP Does
-
-The system takes an uploaded floor plan image (PNG/JPG/PDF) and automatically:
+Upload a floor plan (PNG, JPG, or PDF) and the system automatically:
 
 1. Detects Architectural Components
 
-🧱 Walls (straight + curved)
+Walls (straight and curved)
 
-🚪 Doors
+Doors
 
-🪟 Windows
+Windows
 
-🏠 Rooms (with area calculations)
+Rooms, including polygon extraction
 
 2. Computes Room Areas
 
-Automatic square footage (ft²)
+Automatic square footage (ft²) when scale is known
 
-Pixel area fallback when scaling is unknown
+Pixel-based fallback when scale is unknown
 
-3. Renders a Visual Overlay
+3. Generates a Visual Overlay
 
-Wall boxes
+Wall bounding boxes
 
-Room fill colors
+Room color fills
 
-Labels & tooltips
+Room labels and tooltips
 
-Interactive legend
+Optional legend and layer toggles
 
-4. Exports Key Data
+4. Exports Data
 
-JSON detection output
+JSON output for detections
 
-Visual PNG overlay
+PNG overlay image
 
-Simple interaction through a clean web interface
+Clean and simple web interface
 
-This MVP is the foundation of the full ArchiMind roadmap, which aims to include automated CBC code compliance, fixture counting, ADA validation, and cost estimation.
+This MVP is the foundation for the full ArchiMind platform, which will include automated CBC code compliance, fixture counting, ADA validation, occupancy calculations, and cost estimation.
 
-🏗️ Tech Stack
-Backend (FastAPI)
+Tech Stack
+Backend
+
+FastAPI
 
 Python
 
-Ultralytics YOLO models (Wall/Window/Door/Room)
+Ultralytics YOLO (custom-trained models for walls, doors, windows, rooms)
 
 OpenCV
 
-Geometry tools (Shapely-like utilities)
+Geometry and scaling utilities
 
-NMS thresholding controls
-
-Robust image preprocessing
+Image preprocessing and noise filtering
 
 Frontend
 
@@ -68,131 +66,131 @@ CSS
 
 JavaScript
 
-Dynamic overlays
-
-Interactive UI components
+Dynamic overlays and event handling
 
 Infrastructure
 
-Cloudflare Tunnel (optional)
+Local FastAPI server
 
-Local development FastAPI server
+Optional Cloudflare Tunnel
 
-Virtual environment (.venv)
+Isolated Python virtual environment
 
-📦 Project Structure
+Project Structure
 MVP-Version 2/
 ├── backend/
 │   ├── main.py              # FastAPI entry point
-│   ├── models.py            # YOLO model loading + inference
-│   ├── geometry_v2.py       # Room + wall geometry logic
-│   ├── image_utils.py       # Pre/post-processing
-│   ├── scale.py             # Unit scaling + ft² logic
-│   └── overlay.py           # Drawing overlays
+│   ├── models.py            # YOLO loading and inference
+│   ├── geometry_v2.py       # Room and wall geometry logic
+│   ├── image_utils.py       # Image preprocessing
+│   ├── scale.py             # Scaling, unit conversion
+│   └── overlay.py           # Drawing engine for overlays
 │
 ├── frontend/
-│   ├── index.html           # Main MVP UI
-│   ├── landing.html         # Landing page
-│   ├── styles.css           # Stylesheet
-│   └── app.js               # Main UI logic
+│   ├── index.html           # Main interface
+│   ├── landing.html         # Landing splash page
+│   ├── styles.css           # Styling
+│   └── app.js               # Frontend logic
 │
 ├── tests/
-│   ├── test_api.py          # API tests
+│   ├── test_api.py
 │   ├── test_exports.py
 │   └── test_geometry.py
 │
-├── run_mvp.sh               # Quick start script
-├── cloudflared.yml          # Tunnel config
-├── requirements.txt         # Python dependencies
-├── README.md                # This file
-└── QUICKSTART.md            # Fast developer setup
+├── run_mvp.sh               # Startup script
+├── cloudflared.yml          # Tunnel configuration
+├── requirements.txt         # Dependencies
+├── README.md
+└── QUICKSTART.md            # Developer setup guide
 
-⚙️ How to Run Locally
-1. Clone the repo
+How to Run Locally
+
+Clone the repository
+
 git clone https://github.com/alirezajooyandeh/My_ArchiMind_Version-.git
 cd My_ArchiMind_Version-
 
-2. Create and activate a virtual environment
+
+Create and activate a virtual environment
+
 python3 -m venv .venv
 source .venv/bin/activate
 
-3. Install dependencies
+
+Install dependencies
+
 pip install -r requirements.txt
 
-4. Run the server
+
+Start the server
+
 ./run_mvp.sh
 
 
-The app will be available at:
+The application becomes available at:
 
-Main app: http://localhost:8090/mvp
+Main MVP interface: http://localhost:8090/mvp
 
 Landing page: http://localhost:8090/
 
-🧠 Model Details
+Model Details
 
-The MVP uses 4 custom-trained YOLO models:
+The MVP uses four custom-trained YOLO models:
 
 Model	Purpose
-wall.pt	Wall detection (segmentation + bounding)
+wall.pt	Wall detection (straight and curved)
 door.pt	Door detection
 window.pt	Window detection
-room.pt	Room segmentation + area extraction
+room.pt	Room segmentation and area extraction
 
-Training involved:
-
-Hundreds of annotated architectural floor plans
+Training involved a large dataset of annotated architectural floor plans, including:
 
 Curved wall augmentation
 
-Multi-scale training (1280/1536/1920)
+Multi-resolution training (1280, 1536, 1920)
 
-Advanced augmentation (tiling, mosaic, rotation)
+Mosaic, rotation, tiling, and geometric augmentation
 
-📡 Roadmap (Upcoming Features)
-Short-Term
+Roadmap
+Short-Term Features
 
-ADA door clearance checking
+ADA door clearance validation
 
-Automatic CBC-based occupancy & egress calculations
+CBC-based occupancy and egress calculations
 
-Fixture counting (toilets, sinks, urinals, showers)
+Fixture detection (toilets, sinks, urinals, showers)
 
-Room naming via OCR
+OCR-based room naming
 
-Smart room polygon repair
+Room polygon repair and smoothing
 
-Medium-Term
+Medium-Term Features
 
-AI-based code compliance engine (CBC 2022)
+AI-based CBC 2022 compliance engine
 
-Dynamic architectural specs generator
+Automated architectural specification generator
 
-Revit plug-in
+Revit plugin for direct integration
 
-Space programming & optimization
+Space programming and optimization tools
 
-Long-Term (Vision)
+Long-Term Vision
 
-ArchiMind becomes the “AI brain” of architecture firms:
+ArchiMind becomes an AI engine for architectural design and documentation:
 
 Automated QA/QC
 
 Permit-ready drawing validation
 
-Cost estimation
+Probabilistic cost estimation
 
-Construction documentation automation
+Automated construction documentation
 
-👤 Author
+Author
 
 Ali Jooyandeh
 Architectural Job Captain (K-12 Design)
-AI/Deep Learning Developer
-Founder, ArchiMind
+AI and Deep Learning Developer
+Founder of ArchiMind
 
-📧 Contact
-
-If you’re interested in contributing, partnering, or becoming a co-founder:
-
-📩 alirezajooyandeh@gmail.com
+Contact: alirezajooyandeh@gmail.com

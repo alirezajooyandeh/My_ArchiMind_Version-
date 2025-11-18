@@ -1,0 +1,10 @@
+---
+tunnel: archimind-mvp
+credentials-file: archimind-mvp.json
+
+ingress:
+  - hostname: archimind-demo.localhost
+    service: http://localhost:8090
+  - service: http_status:404
+---
+

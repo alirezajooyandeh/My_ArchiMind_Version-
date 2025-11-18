@@ -1,0 +1,17 @@
+IMPORTANT: Place your architectural background image here!
+
+File name: bg-architecture.png
+Location: frontend/assets/bg-architecture.png
+
+The image should be:
+- High resolution (1920x1080 or larger recommended)
+- Format: PNG, JPG, or JPEG
+- This will be used as the background for both:
+  * Landing page (http://127.0.0.1:8000/)
+  * MVP application (http://127.0.0.1:8000/app)
+
+Once you place the image file here, restart the server and the background will appear.
+
+To test if the image is accessible:
+http://127.0.0.1:8000/static/assets/bg-architecture.png
+

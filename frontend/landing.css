@@ -1,0 +1,68 @@
+:root {
+  --brand: #286BFF;             /* blue */
+  --veil: rgba(0,0,0,0.45);     /* dark overlay */
+  --glow: 0 0 28px rgba(40,107,255,0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-right: 5%;
+  padding-bottom: 33%;
+  background:
+    linear-gradient(var(--veil), var(--veil)),
+    url("/static/assets/bg-architecture.png") center/cover no-repeat fixed;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+}
+
+.brand {
+  text-decoration: none;
+  color: var(--brand);
+  font-weight: 750;
+  letter-spacing: 0.5px;
+  text-shadow: var(--glow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.96;
+  /* responsive sizing */
+  font-size: clamp(32px, 5vw, 72px);
+  line-height: 1;
+  padding: 0.2em 0.4em;
+  border-radius: 20px;
+  background: rgba(16, 18, 20, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(40, 107, 255, 0.3);
+  box-shadow: 0 0 0 0 rgba(40, 107, 255, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+  /* Ensure visibility */
+  display: inline-block;
+  position: relative;
+  z-index: 10;
+  visibility: visible;
+}
+
+.brand:hover, .brand:focus-visible {
+  transform: scale(1.08) translateY(-3px);
+  text-shadow: 0 0 50px rgba(40,107,255,0.7);
+  border-color: rgba(40, 107, 255, 0.7);
+  box-shadow: 0 0 30px rgba(40, 107, 255, 0.6), 0 10px 30px rgba(0, 0, 0, 0.5);
+  outline: none;
+  background: rgba(16, 18, 20, 0.5);
+}
+
+.brand:active {
+  transform: scale(1.02) translateY(0);
+  transition: transform 0.1s;
+}
+
+@media (max-width: 480px) {
+  .brand { letter-spacing: 0.2px; }
+}
+

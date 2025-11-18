@@ -1,0 +1,17 @@
+TO ADD BACKGROUND IMAGE:
+
+1. Place your background image file in this directory with one of these names:
+   - background.jpg
+   - background.jpeg  
+   - background.png
+
+2. The image will automatically appear as the background of the application.
+
+3. If the image doesn't show:
+   - Make sure the file name is exactly "background.jpg" (or .jpeg/.png)
+   - Restart the server after adding the image
+   - Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)
+   - Check the browser console for any 404 errors
+
+Current directory: frontend/assets/images/
+

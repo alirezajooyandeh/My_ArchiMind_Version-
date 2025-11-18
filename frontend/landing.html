@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArchiMind</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .landing-root {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end; /* button on the right */
+      padding-right: 8vw;
+      /* Reuse the same background behavior as the MVP page */
+      background-image: url("/static/assets/bg-architecture.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .archimind-pill {
+      font-size: 2.8rem;
+      font-weight: 800;
+      padding: 1.4rem 3.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.9); /* blue edge */
+      background: rgba(15, 23, 42, 0.35);        /* dark glass */
+      color: #3b82f6;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.7);
+      cursor: pointer;
+      transition: transform 180ms ease-out,
+                  box-shadow 180ms ease-out,
+                  background 180ms ease-out;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      text-shadow: 0 0 28px rgba(59, 130, 246, 0.35);
+      position: relative;
+      overflow: hidden;
+      animation: gentlePulse 3s ease-in-out infinite;
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% {
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.7), 0 0 0 0 rgba(59, 130, 246, 0.4);
+      }
+      50% {
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.7), 0 0 30px 8px rgba(59, 130, 246, 0.3);
+      }
+    }
+
+    .archimind-pill::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .archimind-pill:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .archimind-pill:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 26px 60px rgba(15, 23, 42, 0.85), 0 0 40px 10px rgba(59, 130, 246, 0.4);
+      background: rgba(15, 23, 42, 0.5);
+      animation: none;
+    }
+
+    .archimind-pill:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-root">
+    <button class="archimind-pill" id="archimindPillBtn">
+      ArchiMind
+    </button>
+  </div>
+  <script>
+    // Safe style helper - prevents errors when element is null
+    function safeStyle(el, apply) {
+      if (!el || !el.style) return;
+      apply(el.style);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('archimindPillBtn');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          // Add smooth transition
+          const root = document.querySelector('.landing-root');
+          safeStyle(root, function(s) {
+            s.opacity = '0';
+            s.transition = 'opacity 0.4s ease-out';
+          });
+          
+          setTimeout(() => {
+            window.location.href = '/mvp';
+          }, 400);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

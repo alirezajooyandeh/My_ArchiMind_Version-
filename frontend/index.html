@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArchiMind - Floor Plan Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+    <!-- Main MVP Screen -->
+    <div id="archimind-app-screen" class="app-screen app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Floor Plan Analysis</h1>
+            <div class="header-right">
+                <div class="status-bar" id="statusBar">
+                    <span class="status-indicator" id="statusIndicator"></span>
+                    <span id="statusText">Ready</span>
+                    <span id="timingsText"></span>
+                </div>
+                <button class="btn-refresh" id="refreshBtn" title="Refresh page">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Settings Panel (Left - Fixed Width) -->
+            <aside class="settings-panel" id="settingsPanel">
+                <div class="settings-header">
+                    <h2>SETTINGS</h2>
+                    <button class="btn-smart-defaults" id="smartDefaultsBtn" title="Apply recommended default settings">
+                        Smart Defaults
+                    </button>
+                </div>
+                <div class="settings-content" id="settingsContent">
+                    <!-- Image Size -->
+                    <div class="setting-group">
+                        <label for="imgsz">Image Size</label>
+                        <input type="range" id="imgsz" min="640" max="5000" step="64" value="1536">
+                        <span class="value-display" id="imgszValue">1536</span>
+                    </div>
+
+                    <!-- Confidence Thresholds -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>Confidence Thresholds</h3>
+                            <button class="collapse-btn" data-target="confidenceThresholds">−</button>
+                        </div>
+                        <div class="setting-group-content" id="confidenceThresholds">
+                        <div class="conf-slider">
+                            <label for="wallConf">Wall</label>
+                            <input type="range" id="wallConf" min="0" max="1" step="0.01" value="0.60">
+                            <span class="value-display" id="wallConfValue">0.60</span>
+                        </div>
+                        <div class="conf-slider">
+                            <label for="doorConf">Door</label>
+                            <input type="range" id="doorConf" min="0" max="1" step="0.01" value="0.50">
+                            <span class="value-display" id="doorConfValue">0.50</span>
+                        </div>
+                        <div class="conf-slider">
+                            <label for="windConf">Window</label>
+                            <input type="range" id="windConf" min="0" max="1" step="0.01" value="0.80">
+                            <span class="value-display" id="windConfValue">0.80</span>
+                        </div>
+                        <div class="conf-slider">
+                            <label for="roomConf">Room</label>
+                            <input type="range" id="roomConf" min="0" max="1" step="0.01" value="0.40">
+                            <span class="value-display" id="roomConfValue">0.40</span>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Display Options / Layer Manager -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>LAYER MANAGER</h3>
+                            <button class="collapse-btn" data-target="displayOptions">−</button>
+                        </div>
+                        <div class="setting-group-content" id="displayOptions">
+                        <div class="layer-manager">
+                            <div class="layer-item">
+                                <input type="checkbox" id="walls-toggle" class="layer-toggle" data-layer="walls" checked>
+                                <label for="walls-toggle">
+                                    <svg class="layer-icon eye-icon" viewBox="0 0 16 16">
+                                        <path d="M8 3C4 3 1.73 6.11 1 8c.73 1.89 3 5 7 5s6.27-3.11 7-5c-.73-1.89-3-5-7-5z"/>
+                                        <circle cx="8" cy="8" r="2.5"/>
+                                    </svg>
+                                    <span>Walls</span>
+                                </label>
+                            </div>
+                            <div class="layer-item">
+                                <input type="checkbox" id="doors-toggle" class="layer-toggle" data-layer="doors" checked>
+                                <label for="doors-toggle">
+                                    <svg class="layer-icon eye-icon" viewBox="0 0 16 16">
+                                        <path d="M8 3C4 3 1.73 6.11 1 8c.73 1.89 3 5 7 5s6.27-3.11 7-5c-.73-1.89-3-5-7-5z"/>
+                                        <circle cx="8" cy="8" r="2.5"/>
+                                    </svg>
+                                    <span>Doors</span>
+                                </label>
+                            </div>
+                            <div class="layer-item">
+                                <input type="checkbox" id="windows-toggle" class="layer-toggle" data-layer="windows" checked>
+                                <label for="windows-toggle">
+                                    <svg class="layer-icon eye-icon" viewBox="0 0 16 16">
+                                        <path d="M8 3C4 3 1.73 6.11 1 8c.73 1.89 3 5 7 5s6.27-3.11 7-5c-.73-1.89-3-5-7-5z"/>
+                                        <circle cx="8" cy="8" r="2.5"/>
+                                    </svg>
+                                    <span>Windows</span>
+                                </label>
+                            </div>
+                            <div class="layer-item">
+                                <input type="checkbox" id="rooms-fill-toggle" class="layer-toggle" data-layer="roomsFill" checked>
+                                <label for="rooms-fill-toggle">
+                                    <svg class="layer-icon eye-icon" viewBox="0 0 16 16">
+                                        <path d="M8 3C4 3 1.73 6.11 1 8c.73 1.89 3 5 7 5s6.27-3.11 7-5c-.73-1.89-3-5-7-5z"/>
+                                        <circle cx="8" cy="8" r="2.5"/>
+                                    </svg>
+                                    <span>Rooms (Fill)</span>
+                                </label>
+                            </div>
+                            <div class="layer-item">
+                                <input type="checkbox" id="room-outlines-toggle" class="layer-toggle" data-layer="roomOutlines" checked>
+                                <label for="room-outlines-toggle">
+                                    <svg class="layer-icon eye-icon" viewBox="0 0 16 16">
+                                        <path d="M8 3C4 3 1.73 6.11 1 8c.73 1.89 3 5 7 5s6.27-3.11 7-5c-.73-1.89-3-5-7-5z"/>
+                                        <circle cx="8" cy="8" r="2.5"/>
+                                    </svg>
+                                    <span>Room Outlines</span>
+                                </label>
+                            </div>
+                            <div class="layer-item">
+                                <input type="checkbox" id="labels-toggle" class="layer-toggle" data-layer="labels">
+                                <label for="labels-toggle">
+                                    <svg class="layer-icon eye-icon" viewBox="0 0 16 16">
+                                        <path d="M8 3C4 3 1.73 6.11 1 8c.73 1.89 3 5 7 5s6.27-3.11 7-5c-.73-1.89-3-5-7-5z"/>
+                                        <circle cx="8" cy="8" r="2.5"/>
+                                    </svg>
+                                    <span>Labels</span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Hidden checkboxes for backend compatibility (kept for backward compatibility) -->
+                        <input type="checkbox" id="showLabels" checked style="display: none;">
+                        <input type="checkbox" id="fillRooms" checked style="display: none;">
+                        <input type="checkbox" id="outlineInterior" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Line Thickness -->
+                    <div class="setting-group">
+                        <div class="settings-label-row">
+                            <label for="lineThickness">Line Thickness</label>
+                            <span class="settings-value" id="lineThicknessValue">1 px</span>
+                        </div>
+                        <input type="range" id="lineThickness" min="1" max="8" step="1" value="1">
+                    </div>
+                    
+                    <!-- Line Type -->
+                    <div class="setting-group">
+                        <div class="settings-label-row">
+                            <label>Line Type</label>
+                        </div>
+                        <div class="settings-line-type-buttons">
+                            <button type="button" class="line-type-btn" data-style="solid">Solid</button>
+                            <button type="button" class="line-type-btn" data-style="dashed">Dashed</button>
+                            <button type="button" class="line-type-btn" data-style="dotted">Dotted</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Outline Thickness (legacy, kept for backward compatibility) -->
+                    <div class="setting-group" style="display: none;">
+                        <label for="outlineThickness">Outline Thickness</label>
+                        <input type="number" id="outlineThickness" min="1" max="10" value="2">
+                    </div>
+
+                    <!-- Overlay Style -->
+                    <div class="setting-group">
+                        <label for="overlayStyle">Overlay Style</label>
+                        <select id="overlayStyle">
+                            <option value="standard" selected>Standard</option>
+                            <option value="subtle">Subtle</option>
+                            <option value="high_contrast">High Contrast</option>
+                        </select>
+                    </div>
+
+                    <!-- Image Pre-Processing -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>IMAGE PRE-PROCESSING</h3>
+                            <button class="collapse-btn" data-target="preprocessing">−</button>
+                        </div>
+                        <div class="setting-group-content" id="preprocessing">
+                        <div class="conf-slider">
+                            <label for="binarizationThreshold">Binarization Threshold</label>
+                            <input type="range" id="binarizationThreshold" min="0" max="255" step="1" value="127">
+                            <span class="value-display" id="binarizationThresholdValue">127</span>
+                        </div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="adaptiveThreshold">
+                            <span>Adaptive Threshold</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="edgeSharpening">
+                            <span>Edge Sharpening</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="noiseReduction">
+                            <span>Noise Reduction</span>
+                        </label>
+                        <div class="conf-slider" id="noiseReductionStrengthGroup" style="display: none;">
+                            <label for="noiseReductionStrength">Noise Reduction Strength</label>
+                            <input type="range" id="noiseReductionStrength" min="0" max="2" step="0.1" value="1">
+                            <span class="value-display" id="noiseReductionStrengthValue">1.0</span>
+                        </div>
+                        <div class="conf-slider">
+                            <label for="contrastBoost">Contrast Boost</label>
+                            <input type="range" id="contrastBoost" min="0" max="2" step="0.1" value="0">
+                            <span class="value-display" id="contrastBoostValue">0.0</span>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- PDF Enhancement Options -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>PDF OPTIONS</h3>
+                            <button class="collapse-btn" data-target="pdfOptions">−</button>
+                        </div>
+                        <div class="setting-group-content" id="pdfOptions">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="pdfMode" checked>
+                            <span>PDF Mode</span>
+                        </label>
+                        <label for="pdfDpi">PDF DPI</label>
+                        <input type="number" id="pdfDpi" min="150" max="600" step="50" value="300">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="vectorExtractionMode">
+                            <span>Vector Extraction Mode</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="highQualityRasterization">
+                            <span>High-Quality Rasterization (600 DPI)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="deskewRotationCorrection">
+                            <span>Deskew Rotation Correction</span>
+                        </label>
+                        </div>
+                    </div>
+
+                    <!-- Model Inference Settings -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>MODEL INFERENCE SETTINGS</h3>
+                            <button class="collapse-btn" data-target="modelInference">−</button>
+                        </div>
+                        <div class="setting-group-content" id="modelInference">
+                        <div class="conf-slider">
+                            <label for="wallNmsIou">Wall NMS IoU Threshold</label>
+                            <input type="range" id="wallNmsIou" min="0" max="1" step="0.01" value="0.04">
+                            <span class="value-display" id="wallNmsIouValue">0.04</span>
+                            <div class="settings-hint" id="wallNmsHint">Auto-tuned from detection density: ~0.04</div>
+                        </div>
+                        <div class="conf-slider">
+                            <label for="doorWindowNmsIou">Door/Window NMS IoU Threshold</label>
+                            <input type="range" id="doorWindowNmsIou" min="0" max="1" step="0.01" value="0.05">
+                            <span class="value-display" id="doorWindowNmsIouValue">0.05</span>
+                            <div class="settings-hint" id="doorWinNmsHint">Auto-tuned for doors+windows: ~0.05</div>
+                        </div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="segmentationMaskRefinement">
+                            <span>Segmentation Mask Refinement</span>
+                        </label>
+                        <div class="conf-slider">
+                            <label for="roomPolygonSmoothing">Room Polygon Smoothing</label>
+                            <input type="range" id="roomPolygonSmoothing" min="0" max="1" step="0.01" value="0.1">
+                            <span class="value-display" id="roomPolygonSmoothingValue">0.1</span>
+                        </div>
+                        <div class="conf-slider">
+                            <label for="roomMinConfidence">Room Minimum Confidence (%)</label>
+                            <input type="range" id="roomMinConfidence" min="0" max="100" step="1" value="40">
+                            <span class="value-display" id="roomMinConfidenceValue">40</span>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Geometry & Structure -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>GEOMETRY & STRUCTURE</h3>
+                            <button class="collapse-btn" data-target="geometry">−</button>
+                        </div>
+                        <div class="setting-group-content" id="geometry">
+                        <label for="minWallLength">Minimum Wall Length (px)</label>
+                        <input type="number" id="minWallLength" min="0" max="100" value="10">
+                        <label for="minDoorGapWidth">Minimum Door Gap Width (px)</label>
+                        <input type="number" id="minDoorGapWidth" min="0" max="50" value="6">
+                        <label for="mergeWallsThreshold">Merge Nearby Walls Threshold (px)</label>
+                        <input type="number" id="mergeWallsThreshold" min="0" max="50" value="12">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="snapWallsToAngles">
+                            <span>Snap Walls to 90° / 45°</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="correctBrokenWalls">
+                            <span>Correct Broken Walls</span>
+                        </label>
+                        </div>
+                    </div>
+
+                    <!-- Room Detection Settings -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>ROOM DETECTION SETTINGS</h3>
+                            <button class="collapse-btn" data-target="roomDetection">−</button>
+                        </div>
+                        <div class="setting-group-content" id="roomDetection">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="roomHoleFilling">
+                            <span>Room Hole Filling</span>
+                        </label>
+                        <label for="minInternalGap">Min Internal Gap (px)</label>
+                        <input type="number" id="minInternalGap" min="0" max="50" value="5">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="detectScaleAutomatically">
+                            <span>Detect Scale Automatically</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="doorRemovalForRooms">
+                            <span>Door Removal for Room Segmentation</span>
+                        </label>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Options -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>ADVANCED</h3>
+                            <button class="collapse-btn" data-target="advanced">−</button>
+                        </div>
+                        <div class="setting-group-content" id="advanced">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="preferInteriorFootprint" checked>
+                            <span>Prefer Interior Footprint</span>
+                        </label>
+                        <label for="wallThickPx">Wall Thickness (px)</label>
+                        <input type="number" id="wallThickPx" min="6" max="16" value="10">
+                        <label for="doorBridgePx">
+                            Door Bridge (px)
+                            <span class="tooltip-icon" title="Controls how large gaps in the wall mask should be closed. This is crucial for proper room detection.">ℹ️</span>
+                        </label>
+                        <input type="number" id="doorBridgePx" min="6" max="20" value="12">
+                        <label for="minRoomAreaPx">Min Room Area (px)</label>
+                        <input type="number" id="minRoomAreaPx" min="1000" max="20000" step="100" value="6000">
+                        <label for="footprintGrowPx">Footprint Grow (px)</label>
+                        <input type="number" id="footprintGrowPx" min="0" max="6" value="3">
+                        </div>
+                    </div>
+
+                    <!-- Smart Assist Tools -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>SMART ASSIST TOOLS</h3>
+                            <button class="collapse-btn" data-target="smartAssist">−</button>
+                        </div>
+                        <div class="setting-group-content" id="smartAssist">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="autoTune">
+                            <span>Auto-Tune</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="autoSelectBestImageSize">
+                            <span>Auto-Select Best Image Size</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="autoAdjustModelThresholds">
+                            <span>Auto-Adjust Model Thresholds</span>
+                        </label>
+                        <label for="drawingType">Detect Drawing Type</label>
+                        <select id="drawingType">
+                            <option value="auto">Auto-Detect</option>
+                            <option value="plan">Plan</option>
+                            <option value="rcp">RCP (Reflected Ceiling Plan)</option>
+                            <option value="section">Section</option>
+                        </select>
+                        </div>
+                    </div>
+
+                    <!-- Debug & Analysis -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>DEBUG & ANALYSIS</h3>
+                            <button class="collapse-btn" data-target="debug">−</button>
+                        </div>
+                        <div class="setting-group-content" id="debug">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showConfidenceHeatmap">
+                            <span>Show Model Confidence Heatmap</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showRawBoundingBoxes">
+                            <span>Show Raw Bounding Boxes Before NMS</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="logPreprocessingSteps">
+                            <span>Log Preprocessing Steps</span>
+                        </label>
+                        </div>
+                    </div>
+
+                    <!-- Scale Settings -->
+                    <div class="setting-group collapsible">
+                        <div class="setting-group-header">
+                            <h3>SCALE</h3>
+                            <button class="collapse-btn" data-target="scale">−</button>
+                        </div>
+                        <div class="setting-group-content" id="scale">
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="scaleMode" value="unknown" id="scale-mode-unknown" checked>
+                                <span>Unknown</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="scaleMode" value="explicit" id="scale-mode-explicit">
+                                <span>Explicit</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="scaleMode" value="bar" id="scale-mode-bar">
+                                <span>Scale Bar</span>
+                            </label>
+                        </div>
+                        <div id="explicitScaleGroup" class="scale-input-group" style="display: none;">
+                            <label for="explicitScale">Pixels per Foot</label>
+                            <input type="number" id="explicitScale" min="0.1" step="0.1" value="">
+                        </div>
+                        <!-- Architectural scale dropdown (shown only when Explicit selected) -->
+                        <div id="scale-arch-container" class="scale-input-group" style="display: none;">
+                            <label for="scale-arch-select" class="field-label">Architectural Scale</label>
+                            <select id="scale-arch-select">
+                                <option value="">Select…</option>
+                                <option value="16">1/16&quot; = 1'-0&quot;</option>
+                                <option value="10.6666667">3/32&quot; = 1'-0&quot;</option>
+                                <option value="8">1/8&quot; = 1'-0&quot;</option>
+                                <option value="5.3333333">3/16&quot; = 1'-0&quot;</option>
+                                <option value="4">1/4&quot; = 1'-0&quot;</option>
+                                <option value="2.6666667">3/8&quot; = 1'-0&quot;</option>
+                                <option value="2">1/2&quot; = 1'-0&quot;</option>
+                                <option value="1">1&quot; = 1'-0&quot;</option>
+                                <!-- optional site scales -->
+                                <option value="20">1&quot; = 20'-0&quot;</option>
+                                <option value="30">1&quot; = 30'-0&quot;</option>
+                                <option value="40">1&quot; = 40'-0&quot;</option>
+                            </select>
+                        </div>
+                        <div id="barScaleGroup" class="scale-input-group" style="display: none;">
+                            <p class="help-text">Click two points on the image, then enter distance in feet.</p>
+                            <button type="button" id="startMeasureBtn" class="btn-secondary">Start Measurement</button>
+                            <div id="measureInputGroup" style="display: none;">
+                                <label for="measureDistance">Distance (feet)</label>
+                                <input type="number" id="measureDistance" min="0.1" step="0.1" value="">
+                                <button type="button" id="applyMeasureBtn" class="btn-secondary">Apply</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Buttons (Bottom of Sidebar) -->
+                    <div class="setting-group export-group">
+                        <div class="setting-group-header">
+                            <h3>EXPORT</h3>
+                        </div>
+                        <div class="setting-group-content">
+                        <div class="export-buttons-sidebar">
+                            <button class="btn-secondary btn-export" id="exportPngSidebar">Export PNG</button>
+                            <button class="btn-secondary btn-export" id="exportCsvSidebar">Export CSV</button>
+                            <button class="btn-secondary btn-export" id="exportJsonSidebar">Export JSON</button>
+                            <button class="btn-secondary btn-export" id="exportDxfSidebar" title="Export layers as DXF (coming soon)">Export DXF</button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Canvas Area (Right - Flexible Width) -->
+            <main class="canvas-area">
+                <!-- Upload Zone (shown when no image) -->
+                <div class="upload-section" id="uploadSection">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-content">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <h3>Drop floor plan here</h3>
+                            <p>or click to browse</p>
+                            <p class="file-hint">PDF, JPG, PNG up to 50 MB</p>
+                        </div>
+                        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                    <div class="file-preview" id="filePreview" style="display: none;">
+                        <img id="filePreviewThumb" class="file-preview-thumb" alt="Preview">
+                        <div class="file-preview-info">
+                            <h4 id="filePreviewName"></h4>
+                            <p id="filePreviewSize"></p>
+                            <p id="filePreviewResolution"></p>
+                            <p id="filePreviewPdfInfo" style="display: none;"></p>
+                        </div>
+                    </div>
+                    <div class="upload-buttons">
+                        <button class="btn-primary" id="processBtn" disabled>
+                            <span class="btn-text">Process</span>
+                            <span class="btn-spinner" style="display: none;"></span>
+                        </button>
+                        <p class="processing-caption" id="processingCaption" style="display: none;">Running model inference…</p>
+                    </div>
+                </div>
+
+                <!-- Results Section (shown after processing) -->
+                <div class="results-section" id="resultsSection" style="display: none;">
+                    <div class="error-banner" id="errorBanner" style="display: none;">
+                        <div class="error-banner-header">
+                            <div class="error-banner-title">Processing Error</div>
+                            <button class="error-banner-toggle" id="errorToggle">Show Details</button>
+                        </div>
+                        <div class="error-banner-message" id="errorMessage"></div>
+                        <div class="error-banner-details" id="errorDetails" style="display: none;"></div>
+                    </div>
+
+                    <!-- Tabs Bar (above canvas) -->
+                    <div class="results-tabs-bar">
+                        <div class="results-tabs">
+                            <button class="tab-btn active" data-tab="overlay">Overlay</button>
+                            <button class="tab-btn" data-tab="table">Table</button>
+                            <button class="tab-btn" data-tab="json">JSON</button>
+                        </div>
+                        <button class="btn-secondary btn-reprocess" id="reprocessBtnResults" style="display: none;">Reprocess</button>
+                    </div>
+
+                    <!-- Overlay Tab (Main Canvas View) -->
+                    <div class="tab-content active" id="overlayTab">
+                        <div class="canvas-wrapper">
+                            <!-- Main Canvas Container -->
+                            <div class="image-container" id="imageContainer">
+                                <!-- Floating Legend (top-left inside viewer) -->
+                                <div class="legend-float" id="legend"></div>
+                                
+                                <!-- Floating Zoom Controls (bottom-right inside viewer) -->
+                                <div class="zoom-controls-float">
+                                    <button class="btn-icon" id="zoomIn" title="Zoom In">+</button>
+                                    <button class="btn-icon" id="zoomOut" title="Zoom Out">−</button>
+                                    <button class="btn-icon" id="zoomReset" title="Reset Zoom">⌂</button>
+                                    <button class="btn-icon" id="toggleGrid" title="Toggle Grid Overlay">⊞</button>
+                                </div>
+                                
+                                <!-- Right-side Room Info Card (only shown when room is selected) -->
+                                <div class="room-info-card" id="roomInfoCard" style="display: none;">
+                                    <div class="room-info-header">
+                                        <h3>Selected Room</h3>
+                                        <button class="btn-close" id="closeRoomInfo" title="Close">×</button>
+                                    </div>
+                                    <div class="room-info-content" id="roomInfoContent"></div>
+                                </div>
+                                
+                                <div class="scale-display" id="scaleDisplay" style="display: none;"></div>
+                                <canvas id="overlayCanvas"></canvas>
+                                <canvas id="gridCanvas" style="display: none;"></canvas>
+                                <canvas id="measureCanvas" style="display: none;"></canvas>
+                            </div>
+                        </div>
+                        <div class="processing-time" id="processingTime" style="display: none;"></div>
+                    </div>
+
+                    <!-- Table Tab -->
+                    <div class="tab-content" id="tableTab">
+                        <div class="table-container">
+                            <table id="resultsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Class</th>
+                                        <th>Confidence</th>
+                                        <th>BBox</th>
+                                        <th>Polygon</th>
+                                        <th>Area (ft²)</th>
+                                        <th>Area (px²)</th>
+                                        <th>Centroid</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- JSON Tab -->
+                    <div class="tab-content" id="jsonTab">
+                        <pre id="jsonDisplay"></pre>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+    
+    <!-- Room hover tooltip (follows mouse cursor) -->
+    <div id="room-hover-tooltip" class="room-hover-tooltip" style="display:none;"></div>
+</body>
+</html>
+
